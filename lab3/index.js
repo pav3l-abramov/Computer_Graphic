@@ -79,14 +79,13 @@ const cubeFS =
 
 
 
-var current= "";
+var elment= "";
 var cube1= 0.0;
 var cube2= 0.0;
 var cube3= 0.0;
 var cube4= 0.0;
 var pedestal= 0.0;
 var scene= 0.0;
-var cubes= 0.0;
 
 function start() {
     main("scene");
@@ -123,10 +122,10 @@ function main(id) {
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     gl.clearDepth(1.0);
         
-                    drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene, cubes, [-8.0, 0.0, 0.0], 1.0);
-                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene, cubes, [-2.0, 0.0, 0.0], 1.5);
-                    drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, cubes, [4.0, 0.0, 0.0], 0.75);
-                    drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene, cubes, [8.0, 0.0, 0.0], 2.0);
+                    drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0);
+                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [-2.0, 0.0, 0.0], 1.5);
+                    drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75);
+                    drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0);
                 }
                 requestAnimationFrame(render);
             }
@@ -136,34 +135,31 @@ function main(id) {
     function checkKeyPressed(e) {
         if (e.keyCode == "49") 
         {
-             current = "1";
+            elment = "1";
         }
         if (e.keyCode == "50") 
         {
-             current = "2"; 
+            elment = "2"; 
         }
         if (e.keyCode == "51") 
         {
-             current = "3"; 
+            elment = "3"; 
         }
         if (e.keyCode == "52") 
         {
-             current = "4"; 
+            elment = "4"; 
         }
         if (e.keyCode == "53") 
         {
-             current = "p";
+            elment = "p";
         }
         if (e.keyCode == "54") 
         {
-             current = "s"; 
+            elment = "s"; 
         }
-        if (e.keyCode == "55")
-        {
-             current = "c"; 
-        }
+ 
         if (e.keyCode == "37") {
-            switch (current) {
+            switch (elment) {
                 case "1":
                      cube1 -= 0.1;
                       break;
@@ -182,13 +178,11 @@ function main(id) {
                 case "s": 
                     scene -= 0.1; 
                     break;
-                case "c": 
-                    cubes -= 0.1; 
-                    break;
-            }
+
         }
+    }
         if (e.keyCode == "39") {
-            switch (current) {
+            switch (elment) {
                 case "1": 
                     cube1 += 0.1;  
                     break;
@@ -207,14 +201,11 @@ function main(id) {
                 case "s": 
                     scene += 0.1;  
                     break;
-                case "c": 
-                    cubes += 0.1;  
-                    break;
             }
         }
     }
     
-    function drawCube(shaderProgram, color, rotateCube, rotatePedestal, rotateScene, rotateAll, pos, size) {
+    function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size) {
         const vertices = [
             -1.0, -1.0, 1.0, 
             1.0, -1.0, 1.0, 
@@ -280,12 +271,12 @@ function main(id) {
     
         glMatrix.mat4.translate(worldMatrix, worldMatrix, [0.0, -4.0, -30]);
     
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, rotateScene, [0, 1, 0]);
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
         glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, rotatePedestal, [0, 1, 0]);
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
         glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, rotateCube, [0, 1, 0]);
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, rotateAll, [0, 1, 0]);
+        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+
         
         gl.uniform4f(fColor, color[0], color[1], color[2], color[3]);
         gl.uniformMatrix4fv(mProj, false, projectionMatrix);
