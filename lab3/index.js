@@ -59,10 +59,9 @@ const cubeVS =
     '#version 300 es',
     'in vec3 aVertexPosition;',
     'uniform mat4 mWorld;',
-    'uniform mat4 mView;',
     'uniform mat4 mProj;',
     'void main() {',
-    '    gl_Position = mProj * mView * mWorld * vec4(aVertexPosition, 1.0);',
+    '    gl_Position = mProj  * mWorld * vec4(aVertexPosition, 1.0);',
     '}',
 ].join('\n');
 
@@ -122,10 +121,10 @@ function main(id) {
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     gl.clearDepth(1.0);
         
-                    drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0);
-                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [-2.0, 0.0, 0.0], 1.5);
-                    drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75);
-                    drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0);
+                    drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0,'1');
+                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [-2.0, 0.0, 0.0], 1.5,'2');
+                    drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75, '3');
+                    drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0, '4');
                 }
                 requestAnimationFrame(render);
             }
@@ -204,8 +203,9 @@ function main(id) {
             }
         }
     }
+
     
-    function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size) {
+    function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size, cube_type) {
         const vertices = [
             -1.0, -1.0, 1.0, 
             1.0, -1.0, 1.0, 
@@ -250,7 +250,6 @@ function main(id) {
     
         const vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         const mProj = gl.getUniformLocation(shaderProgram, "mProj");
-        const mView = gl.getUniformLocation(shaderProgram, "mView");
         const mWorld = gl.getUniformLocation(shaderProgram, "mWorld");
         const fColor = gl.getUniformLocation(shaderProgram, "fColor");
     
@@ -263,27 +262,68 @@ function main(id) {
         const Far = 500.0;
     
         const projectionMatrix = glMatrix.mat4.create();
-        const viewMatrix = glMatrix.mat4.create();
         const worldMatrix = glMatrix.mat4.create();
     
         glMatrix.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
-    
-    
         glMatrix.mat4.translate(worldMatrix, worldMatrix, [0.0, -4.0, -30]);
+        switch (cube_type) {
+            case "1":
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
     
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
-        glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
-        glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-        glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+                // Translate the cube to the center of rotation
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
+    
+                // Rotate the cube around its center
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
+    
+                // Translate the cube back to its original position
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+                break;
+                
+            case "2":
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
+    
+                // Translate the cube to the center of rotation
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
+    
+                // Rotate the cube around its center
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
+    
+                // Translate the cube back to its original position
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+                break;
+            case "3":
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
+    
+                // Translate the cube to the center of rotation
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
+    
+                // Rotate the cube around its center
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
+    
+                // Translate the cube back to its original position
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
 
-        
+                break;
+            case "4":
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
+    
+                // Translate the cube to the center of rotation
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
+    
+                // Rotate the cube around its center
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
+    
+                // Translate the cube back to its original position
+                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
+                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+                break;
+        }     
         gl.uniform4f(fColor, color[0], color[1], color[2], color[3]);
         gl.uniformMatrix4fv(mProj, false, projectionMatrix);
-        gl.uniformMatrix4fv(mView, false, viewMatrix);
         gl.uniformMatrix4fv(mWorld, false, worldMatrix);
-        
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 36);
     }
-    
-    
