@@ -121,10 +121,10 @@ function main(id) {
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     gl.clearDepth(1.0);
         
-                    drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0,'1');
-                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [-2.0, 0.0, 0.0], 1.5,'2');
-                    drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75, '3');
-                    drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0, '4');
+                     drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0,'1');
+                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [0.0, 0.0, 0.0], 0.5,'2');
+                     drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75, '3');
+                     drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0, '4');
                 }
                 requestAnimationFrame(render);
             }
@@ -265,63 +265,17 @@ function main(id) {
         const worldMatrix = glMatrix.mat4.create();
     
         glMatrix.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
-        glMatrix.mat4.translate(worldMatrix, worldMatrix, [0.0, -4.0, -30]);
-        switch (cube_type) {
-            case "1":
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
-    
-                // Translate the cube to the center of rotation
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-    
-                // Rotate the cube around its center
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
-    
-                // Translate the cube back to its original position
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
-                break;
-                
-            case "2":
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
-    
-                // Translate the cube to the center of rotation
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-    
-                // Rotate the cube around its center
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
-    
-                // Translate the cube back to its original position
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
-                break;
-            case "3":
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
-    
-                // Translate the cube to the center of rotation
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-    
-                // Rotate the cube around its center
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
-    
-                // Translate the cube back to its original position
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+        // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
+        glMatrix.mat4.translate(projectionMatrix, projectionMatrix, [0.0, -4.0, -30]);//можно было не трогать камеру, но так проще для понимания
+        glMatrix.mat4.translate(worldMatrix, worldMatrix, [0.0, 0.0, 0.0]);
+        //кубы еще не разделены, ставит центр сцены в [12.0, 0.0, 0.0], а крутит вокруг [0.0, 0.0, 0.0]
+                glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Scene);
+                  glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);//становится локальным центром пьедестала 
+                 //кубы уже  разделены (благодаря pos), ставит центр каждого отдельного куба pos относительно [12.0, 0.0, 0.0], а крутит вокруг [12.0, 0.0, 0.0]
+                 glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Pedestal);
+                 glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);//локальный центр каждого куба, т.к. больше нет translate, то у него больше нет точки, относительно которой он будет вращать локальный центр, поэтому каждый куб имеет свой локальный центр, и каждый центр прописан в pos
+                 glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
 
-                break;
-            case "4":
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Scene, [0, 1, 0]);
-    
-                // Translate the cube to the center of rotation
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);
-    
-                // Rotate the cube around its center
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Pedestal, [0, 1, 0]);
-    
-                // Translate the cube back to its original position
-                glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);
-                glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
-                break;
-        }     
         gl.uniform4f(fColor, color[0], color[1], color[2], color[3]);
         gl.uniformMatrix4fv(mProj, false, projectionMatrix);
         gl.uniformMatrix4fv(mWorld, false, worldMatrix);
