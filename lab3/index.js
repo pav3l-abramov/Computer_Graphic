@@ -121,10 +121,10 @@ function main(id) {
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     gl.clearDepth(1.0);
         
-                     drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0,'1');
-                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [0.0, 0.0, 0.0], 0.5,'2');
-                     drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75, '3');
-                     drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0, '4');
+                     drawCube(shaderProgram, [1.0, 1.0, 0.0, 1.0], cube1,pedestal, scene,  [-8.0, 0.0, 0.0], 1.0);
+                    drawCube(shaderProgram, [0.0, 1.0, 1.0, 1.0], cube2,pedestal, scene,  [0.0, 0.0, 0.0], 0.5);
+                     drawCube(shaderProgram, [1.0, 0.0, 1.0, 1.0], cube3,pedestal, scene, [4.0, 0.0, 0.0], 0.75);
+                     drawCube(shaderProgram, [0.0, 1.0, 0.0, 1.0], cube4,pedestal, scene,  [8.0, 0.0, 0.0], 2.0);
                 }
                 requestAnimationFrame(render);
             }
@@ -205,7 +205,7 @@ function main(id) {
     }
 
     
-    function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size, cube_type) {
+    function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size) {
         const vertices = [
             -1.0, -1.0, 1.0, 
             1.0, -1.0, 1.0, 
@@ -274,7 +274,7 @@ function main(id) {
                  //кубы уже  разделены (благодаря pos), ставит центр каждого отдельного куба pos относительно [12.0, 0.0, 0.0], а крутит вокруг [12.0, 0.0, 0.0]
                  glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Pedestal);
                  glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);//локальный центр каждого куба, т.к. больше нет translate, то у него больше нет точки, относительно которой он будет вращать локальный центр, поэтому каждый куб имеет свой локальный центр, и каждый центр прописан в pos
-                 glMatrix.mat4.rotate(worldMatrix, worldMatrix, Cube, [0, 1, 0]);
+                 glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Cube);
 
         gl.uniform4f(fColor, color[0], color[1], color[2], color[3]);
         gl.uniformMatrix4fv(mProj, false, projectionMatrix);
