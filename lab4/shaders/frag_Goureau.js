@@ -6,7 +6,7 @@ const GoureauFS =[
     'in highp vec3 vLightWeighting;',
     'in vec4 vColor;',
     'out vec4 fragColor;',
-    'void main() {',
+    'void main(void) {',
     '    fragColor = vec4(vLightWeighting.rgb * vColor.rgb, vColor.a);',
     '}',
     ''

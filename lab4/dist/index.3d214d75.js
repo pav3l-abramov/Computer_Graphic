@@ -611,16 +611,6 @@ function main(id) {
                 0.0,
                 1.0
             ], cube1, pedestal, scene, [
-                10.0,
-                0.0,
-                0.0
-            ], 1.0, "cube5");
-            drawCube(shaderProgram, [
-                1.0,
-                0.0,
-                0.0,
-                1.0
-            ], cube1, pedestal, scene, [
                 -8,
                 0.0,
                 0.0
@@ -661,6 +651,39 @@ function main(id) {
     requestAnimationFrame(render);
 }
 function drawCube(shaderProgram, color, Cube, Pedestal, Scene, pos, size, type) {
+    //положение источника света
+    const lightPositionValue = [
+        0,
+        11,
+        distance
+    ];
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uLightPosition"), lightPositionValue);
+    //цвет фонового освещения
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uAmbientLightColor"), [
+        0.1,
+        0.1,
+        0.1
+    ]);
+    //цвет диффузиозного освещения
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uDiffuseLightColor"), [
+        0.7,
+        0.7,
+        0.7
+    ]);
+    //спекулярный цвет освещения
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uSpecularLightColor"), [
+        1.0,
+        1.0,
+        1.0
+    ]);
+    //коэффициент линейного рассеивания
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uc1"), c1);
+    //коэффициент квадратичного рассеивания
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uc2"), c2);
+    //коэффициент фонового освещения
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uAmbientIntensity"), ambientCoeff);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uLightingModel"), lightingModel);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uShadingModel"), shadingModel);
     //позиции вершин
     const vertices = [
         // Front face
@@ -959,39 +982,6 @@ function drawCube(shaderProgram, color, Cube, Pedestal, Scene, pos, size, type) 
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram, "uNormalMatrix"), false, normalMatrix);
     //отрисовка кубов
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
-    //положение источника света
-    const lightPositionValue = [
-        0,
-        -2,
-        distance
-    ];
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uLightPosition"), lightPositionValue);
-    //цвет фонового освещения
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uAmbientLightColor"), [
-        0.1,
-        0.1,
-        0.1
-    ]);
-    //цвет диффузиозного освещения
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uDiffuseLightColor"), [
-        0.7,
-        0.7,
-        0.7
-    ]);
-    //спекулярный цвет освещения
-    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uSpecularLightColor"), [
-        1.0,
-        1.0,
-        1.0
-    ]);
-    //коэффициент линейного рассеивания
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uc1"), c1);
-    //коэффициент квадратичного рассеивания
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uc2"), c2);
-    //коэффициент фонового освещения
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uAmbientIntensity"), ambientCoeff);
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uLightingModel"), lightingModel);
-    gl.uniform1f(gl.getUniformLocation(shaderProgram, "uShadingModel"), shadingModel);
 }
 start();
 function initWebGL(canvas) {
@@ -1144,9 +1134,7 @@ const PhongFS = [
     "uniform vec3 uSpecularLightColor;",
     "uniform float uShadingModel;",
     "uniform float uAmbientCoeff;",
-    "const float shininess = 32.0;",
-    "const float edge0 = 0.1;",
-    "const float edge1 = 0.3;",
+    "const float shininess = 16.0;",
     "precision mediump float;",
     "out vec4 fragColor;",
     "void main(void) {",
@@ -1158,7 +1146,7 @@ const PhongFS = [
     "float specularLightDot = max(dot(reflectionVector, viewVectorEye), 0.0);",
     "float specularLightParam = pow(specularLightDot, shininess);",
     "float attenuation = 1.0 / (1.0 + uc1 * d + uc2 * d * d);",
-    "vec3 vLightWeighting = uAmbientLightColor * uAmbientIntensity + (uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam) * attenuation;;",
+    "vec3 vLightWeighting = uAmbientLightColor * uAmbientIntensity +  (uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam) * attenuation;",
     "fragColor = vec4(vLightWeighting.rgb * vColor.rgb, vColor.a);",
     "",
     "",
@@ -1231,7 +1219,7 @@ const PhongVS = [
     "vec4 vertexPositionEye4 = mWorld * vec4(aVertexPosition, 1.0);",
     "vec3 vertexPositionEye3 = vertexPositionEye4.xyz / vertexPositionEye4.w;",
     "vec3 lightDirection = normalize(uLightPosition - vertexPositionEye3);",
-    "float d = distance(uLightPosition,vPosition);",
+    "float d = distance(uLightPosition,vertexPositionEye3);",
     "vec3 normal = normalize(mat3(uNormalMatrix) * aVertexNormal);",
     "float diffuseLightDot = max(dot(normal, lightDirection), 0.0);",
     "vec3 reflectionVector = normalize(reflect(-lightDirection, normal));",
@@ -1290,7 +1278,7 @@ const BlinnPhongVS = [
     "vec3 viewVectorEye = -normalize(vertexPositionEye3);",
     "float specularLightDot = max(dot(normal, halfway), 0.0);",
     "float specularLightParam = pow(specularLightDot, shininess);",
-    "float d = distance(uLightPosition,vPosition);",
+    "float d = distance(uLightPosition,vertexPositionEye3);",
     "float attenuation = 1.0 / (1.0 + uc1 * d + uc2 * d * d);",
     "vLightWeighting = uAmbientLightColor * uAmbientIntensity +(uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam) * attenuation;",
     "gl_Position = mProj * mWorld * vec4(aVertexPosition, 1.0);",
@@ -1330,17 +1318,17 @@ const LambertVS = [
     "out vec3 vNormal;",
     "out vec3 vCameraPosition;",
     "out highp vec3 vLightWeighting;",
-    "const float shininess = 32.0;",
+    "const float shininess = 16.0;",
     "void main() {",
     "vec4 vertexPositionEye4 = mWorld * vec4(aVertexPosition, 1.0);",
     "vec3 vertexPositionEye3 = vertexPositionEye4.xyz / vertexPositionEye4.w;",
     " vec3 lightDirection = normalize(uLightPosition - vertexPositionEye3);",
-    "float d = distance(uLightPosition,vPosition);",
+    "float d = distance(uLightPosition,vertexPositionEye3);",
     "float attenuation = 1.0 / (1.0 + uc1 * d + uc2 * d * d);",
     "vec3 normal = normalize(mat3(uNormalMatrix) * aVertexNormal);",
     "float diffuseLightDot = max(dot(normal, lightDirection), 0.0);",
     "vec3 viewVectorEye = -normalize(vertexPositionEye3);",
-    "vLightWeighting = uAmbientLightColor * uAmbientIntensity + uDiffuseLightColor * diffuseLightDot;",
+    "vLightWeighting = uAmbientLightColor * uAmbientIntensity + uDiffuseLightColor * diffuseLightDot* attenuation;;",
     "gl_Position = mProj * mWorld * vec4(aVertexPosition, 1.0);",
     "vPosition = vertexPositionEye3;",
     "vColor = aVertexColor;",
@@ -1361,7 +1349,7 @@ const GoureauFS = [
     "in highp vec3 vLightWeighting;",
     "in vec4 vColor;",
     "out vec4 fragColor;",
-    "void main() {",
+    "void main(void) {",
     "    fragColor = vec4(vLightWeighting.rgb * vColor.rgb, vColor.a);",
     "}",
     ""
