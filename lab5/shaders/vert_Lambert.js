@@ -3,6 +3,7 @@ const LambertVS =[
     'in vec3 aVertexPosition;',
     'in vec3 aVertexNormal;',
     'in vec4 aVertexColor;',
+    'in vec2 aTextureCoords;',
 
     'uniform mat4 mWorld;',
     'uniform mat4 mProj;',
@@ -27,6 +28,7 @@ const LambertVS =[
     'out vec3 vNormal;',
     'out vec3 vCameraPosition;',
     'out highp vec3 vLightWeighting;',
+    'out vec2 vTextureCoords;',
     'const float shininess = 32.0;',
     'void main() {',
     'vec4 vertexPositionEye4 = mWorld * vec4(aVertexPosition, 1.0);',
@@ -43,6 +45,7 @@ const LambertVS =[
     'vColor = aVertexColor;',
     'vNormal = normal;',
     'vCameraPosition = viewVectorEye;',
+    'vTextureCoords = aTextureCoords;',
     '}'
 ].join('\n');
 export default LambertVS;

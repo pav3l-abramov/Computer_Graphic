@@ -39,8 +39,6 @@ const PhongFS =
         'float specularLightParam = pow(specularLightDot, shininess);',
             'float attenuation = 1.0 / (1.0 + uc1 * d + uc2 * d * d);',
         'vec3 vLightWeighting = uAmbientLightColor * uAmbientIntensity + (uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam) * attenuation;;' ,
-            //'fragColor = vec4(vLightWeighting * (digTex.rgb * digTex.a+ matTex.rgb * matTex.a + vColor.rgb *(1.0-digTex.a)* (1.0 - matTex.a)),1.0);',
-        //'fragColor = (digTex.a * digTex + (matTex.a * matTex + vColor * (1.0 - matTex.a))) * vec4(vLightWeighting, 1);',
         'fragColor=vec4(vLightWeighting *(digTex.rgb * digTex.a+ (1.0-digTex.a)*(matTex.a * matTex.rgb + vColor.rgb * (1.0 - matTex.a))),1);',
         '',
         '',
