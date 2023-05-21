@@ -4,6 +4,10 @@ import trackFS from "./shaders/bengal/trackFS"
 import trackVS from "./shaders/bengal/trackVS"
 import fireworkFS from "./shaders/firework/fireworkFS"
 import fireworkVS from "./shaders/firework/fireworkVS"
+
+import fireworkColorFS from "./shaders/firework/fireworkColorFS"
+import fireworkColorVS from "./shaders/firework/fireworkColorVS"
+
 import smokeFS from './shaders/smoke/smokeFS'
 import smokeVS from './shaders/smoke/smokeVS'
 import rainFS from './shaders/rain/rainFS'
@@ -561,12 +565,18 @@ function main_rain() {
 function Fire() {
     this.init();
 }
+function FireColor() {
+    this.init();
+}
+function FireColor2() {
+    this.init();
+}
 
 // количество искр
-Fire.sparksCount = 50;
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
+Fire.sparksCount = 500;
+
+FireColor.sparksCount = 500;
+FireColor2.sparksCount = 500;
 
 function main_firework() {
     Fire.prototype.init = function () {
@@ -576,14 +586,14 @@ function main_firework() {
         // задаём направление полёта искры в градусах, от 0 до 360
         const angle = Math.floor(Math.random() * (a*2+1)) * Math.PI/a;
         // радиус - это расстояние, которое пролетит искра
-        const radius = Math.floor(Math.random() * 3);
+        const radius = Math.floor(Math.random() * 4);
         // отмеряем точки на окружности - максимальные координаты искры
         this.xMax = Math.cos(angle) * radius;
         this.yMax = Math.sin(angle) * radius;
 
         // dx и dy - приращение искры за вызов отрисовки, то есть её скорость,
         // у каждой искры своя скорость. multiplier подобран экспериментально
-        const multiplier = 125 + Math.random() * 125;
+        const multiplier = 500 + Math.random() * 125;
         this.dx = this.xMax / multiplier;
         this.dy = this.yMax / multiplier;
 
@@ -591,7 +601,7 @@ function main_firework() {
         // делаем каждой искре свой отступ, но не более максимальных значений.
         this.x = (this.dx * 10) % this.xMax;
         this.y = (this.dy * 10) % this.yMax;
-    };
+     };
 
     Fire.prototype.move = function (time) {
         // находим разницу между вызовами отрисовки, чтобы анимация работала
@@ -600,7 +610,7 @@ function main_firework() {
         this.timeFromCreation = time;
 
         // приращение зависит от времени между отрисовками
-        const speed = timeShift*0.05;
+        const speed = timeShift*0.5;
         this.x += this.dx * speed;
         this.y += this.dy * speed;
 
@@ -609,6 +619,103 @@ function main_firework() {
            this.init();
         }
     };
+
+    FireColor.prototype.init = function () {
+        // время создания искры
+        this.timeFromCreation = performance.now();
+
+
+        const startX = Math.random() * 0.08+5 ;// генерируем случайное значение по ширине окна
+        const startY = Math.random() * 0.02 ;
+
+        const a =Math.floor(Math.random() * 10);
+        // задаём направление полёта искры в градусах, от 0 до 360
+        const angle = Math.floor(Math.random() * (a*2+1)) * Math.PI/a;
+        // радиус - это расстояние, которое пролетит искра
+        const radius = Math.floor(Math.random() * 8);
+        // отмеряем точки на окружности - максимальные координаты искры
+        this.xMax =startX+ Math.cos(angle) * radius;
+        this.yMax =startY+ Math.sin(angle) * radius;
+
+        // this.size=Math.random()*2;
+        this.color=[Math.random(),Math.random(),Math.random(),1];
+
+        const multiplier = 50 + Math.random() * 125;
+        this.dx =-(startX- this.xMax) / multiplier;
+        this.dy =-(startY-this.yMax) / multiplier;
+        this.x=startX;
+        this.y=startY;
+        this.xstart=startX;
+        this.ystart=startY;
+
+        // Для того, чтобы не все искры начинали движение из начала координат,
+    };
+    FireColor.prototype.move = function (time) {
+        // находим разницу между вызовами отрисовки, чтобы анимация работала
+        // одинаково на компьютерах разной мощности
+        const timeShift = time - this.timeFromCreation;
+        this.timeFromCreation = time;
+
+        // приращение зависит от времени между отрисовками
+        const speed = timeShift*0.05;
+        this.x += (this.dx * speed)+0.0000001;
+        this.y += (this.dy * speed)+0.0000001;
+
+        // если искра достигла конечной точки, запускаем её заново из начала координат
+        if (Math.abs(this.xstart-this.x) > Math.abs(this.xstart-this.xMax) || Math.abs(this.ystart-this.y) > Math.abs(this.ystart-this.yMax)) {
+            this.init();
+        }
+    };
+
+
+    FireColor2.prototype.init = function () {
+        // время создания искры
+        this.timeFromCreation = performance.now();
+
+
+        const startX = Math.random() * 0.08-5 ;// генерируем случайное значение по ширине окна
+        const startY = Math.random() * 0.02 ;
+
+        const a =Math.floor(Math.random() * 10);
+        // задаём направление полёта искры в градусах, от 0 до 360
+        const angle = Math.floor(Math.random() * (a*2+1)) * Math.PI/a;
+        // радиус - это расстояние, которое пролетит искра
+        const radius = Math.floor(Math.random() * 8);
+        // отмеряем точки на окружности - максимальные координаты искры
+        this.xMax =startX+ Math.cos(angle) * radius;
+        this.yMax =startY+ Math.sin(angle) * radius;
+
+        // this.size=Math.random()*2;
+        this.color=[Math.random(),Math.random(),Math.random(),1];
+
+        const multiplier = 50 + Math.random() * 125;
+        this.dx =-(startX- this.xMax) / multiplier;
+        this.dy =-(startY-this.yMax) / multiplier;
+        this.x=startX;
+        this.y=startY;
+        this.xstart=startX;
+        this.ystart=startY;
+
+        // Для того, чтобы не все искры начинали движение из начала координат,
+    };
+    FireColor2.prototype.move = function (time) {
+        // находим разницу между вызовами отрисовки, чтобы анимация работала
+        // одинаково на компьютерах разной мощности
+        const timeShift = time - this.timeFromCreation;
+        this.timeFromCreation = time;
+
+        // приращение зависит от времени между отрисовками
+        const speed = timeShift*0.05;
+        this.x += (this.dx * speed)+0.0000001;
+        this.y += (this.dy * speed)+0.0000001;
+
+        //если искра достигла конечной точки, запускаем её заново из начала координат
+        if (Math.abs(this.xstart-this.x) > Math.abs(this.xstart-this.xMax) || Math.abs(this.ystart-this.y) > Math.abs(this.ystart-this.yMax)) {
+            this.init();
+        }
+    };
+
+
     const gl = canvas.getContext("webgl2");
     if (!gl) {
         return;
@@ -627,6 +734,18 @@ function main_firework() {
     const colorAttributeLocationTrack = gl.getAttribLocation(programTrack, "a_color");
     const pMatrixUniformLocationTrack = gl.getUniformLocation(programTrack, "u_pMatrix");
     const mvMatrixUniformLocationTrack = gl.getUniformLocation(programTrack, "u_mvMatrix");
+
+    let programColorFirework = initShaderProgram(gl, fireworkColorVS, fireworkColorFS);
+
+    // инициализация программы следов для цветных фейерверков
+
+    const positionAttributeLocationFirework = gl.getAttribLocation(programColorFirework, "a_position");
+    const colorAttributeLocationFirework = gl.getAttribLocation(programColorFirework, "aVertexColor");
+    const pMatrixUniformLocationFirework = gl.getUniformLocation(programColorFirework, "uPMatrix");
+    const mvMatrixUniformLocationFirework = gl.getUniformLocation(programColorFirework, "uMVMatrix");
+    const SizeFirework = gl.getUniformLocation(programColorFirework, "aVertexSize");
+
+
 
     // инициализация программы искр
     let programSpark = initShaderProgram(gl, fireworkVS, fireworkFS);
@@ -648,11 +767,54 @@ function main_firework() {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.bindTexture(gl.TEXTURE_2D, null);
 
+        //requestAnimationFrame(drawScene);
+    });
+
+    const texture2 = gl.createTexture();
+
+    const image2 = new Image();
+    image2.src = rain_texture;
+    image2.addEventListener('load', function() {
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image2);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
         requestAnimationFrame(drawScene);
     });
 
+
     const mvMatrix = mat4.create();
     const pMatrix = mat4.create();
+
+    function drawColorFire(positions,color) {
+        gl.useProgram(programColorFirework);
+        const particleVertexPosBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        const particleVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexColorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.DYNAMIC_DRAW);
+
+        // const particleVertexSizeBuffer = gl.createBuffer();
+        // gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexSizeBuffer);
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(), gl.DYNAMIC_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexPosBuffer);
+        gl.vertexAttribPointer(positionAttributeLocationFirework, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexColorBuffer);
+        gl.vertexAttribPointer(colorAttributeLocationFirework, 4, gl.FLOAT, false, 0, 0);
+
+         // gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexSizeBuffer);
+         // gl.vertexAttribPointer(vertexSizeAttribute, 1, gl.FLOAT, false, 0, 0);
+        gl.uniformMatrix4fv(pMatrixUniformLocationFirework, false, pMatrix);
+        gl.uniformMatrix4fv(mvMatrixUniformLocationFirework, false, mvMatrix);
+        gl.drawArrays(gl.POINTS, 0, positions.length / 3);
+    }
 
     function drawTracks(positions) {
         const colors = [];
@@ -710,12 +872,42 @@ function main_firework() {
 
         gl.drawArrays(gl.POINTS, 0, positions.length / 3);
     }
+    function drawColorFire2(positions) {
+        gl.useProgram(programSpark);
+
+        gl.uniformMatrix4fv(pMatrixUniformLocationSpark, false, pMatrix);
+        gl.uniformMatrix4fv(mvMatrixUniformLocationSpark, false, mvMatrix);
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+        gl.uniform1i(textureLocationSpark, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+        gl.vertexAttribPointer(positionAttributeLocationSpark, 3, gl.FLOAT, false, 0, 0);
+
+        gl.enableVertexAttribArray(positionAttributeLocationSpark);
+
+        gl.drawArrays(gl.POINTS, 0, positions.length / 3);
+    }
 
     const sparks = [];
     for (let i = 0; i < Fire.sparksCount; i++) {
         sparks.push(new Fire());
     }
+    const colorsparks = [];
+    for (let i = 0; i < FireColor.sparksCount; i++) {
+        colorsparks.push(new FireColor());
+    }
 
+    const colorsparks2 = [];
+    for (let i = 0; i < FireColor2.sparksCount; i++) {
+        colorsparks2.push(new FireColor2());
+    }
     function drawScene(now) {
 
         gl.clearColor(0, 0, 0, 1);
@@ -728,6 +920,13 @@ function main_firework() {
         for (let i = 0; i < sparks.length; i++) {
             sparks[i].move(now);
         }
+        for (let i = 0; i < colorsparks.length; i++) {
+            colorsparks[i].move(now);
+        }
+        for (let i = 0; i < colorsparks2.length; i++) {
+            colorsparks2[i].move(now);
+        }
+
 
         const positions = [];
         sparks.forEach(function(item, i, arr) {
@@ -737,8 +936,35 @@ function main_firework() {
             positions.push(0);
         });
 
+        const positionsColor = [];
+        colorsparks.forEach(function(item, i, arr) {
+            positionsColor.push(item.x);
+            positionsColor.push(item.y);
+            // искры двигаются только в одной плоскости xy
+            positionsColor.push(0);
+        });
+
+        const positionsColor2 = [];
+        colorsparks2.forEach(function(item, i, arr) {
+            positionsColor2.push(item.x);
+            positionsColor2.push(item.y);
+            // искры двигаются только в одной плоскости xy
+            positionsColor2.push(0);
+        });
+
+
+        const color = [];
+        colorsparks.forEach(function(item, i, arr) {
+            color.push(item.color[0]);
+            color.push(item.color[1]);
+            color.push(item.color[2]);
+            color.push(item.color[3]);
+        });
+
         drawTracks(positions);
         drawSparks(positions);
+        drawColorFire(positionsColor,color);
+        drawColorFire2(positionsColor2);
 
         if (punkt===3) requestAnimationFrame(drawScene);
         if(punkt===0) main_bengal();

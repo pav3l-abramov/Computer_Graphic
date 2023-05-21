@@ -1,19 +1,14 @@
-const fireworkVS =[
+const bengalVS =[
     '#version 300 es',
-    'in vec3 aVertexPosition;',
-    'in vec4 aVertexColor;',
-    'in float aVertexSize;',
-    'uniform mat4 uMVMatrix;',
-    'uniform mat4 uPMatrix;',
-    'out vec4 vColor;',
-    'out vec3 pos;',
-    '',
+    'in vec3 a_position;',
+    'uniform mat4 u_mvMatrix;',
+    'uniform mat4 u_pMatrix;',
     'void main() {',
-    'gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);',
-    ' gl_PointSize = aVertexSize;',
-    'vColor = aVertexColor;',
+    'gl_Position = u_pMatrix * u_mvMatrix * vec4(a_position, 1.0);',
+    'gl_PointSize = 16.0;',
     '}',
+    '',
     '',
     ''
 ].join('\n');
-export default fireworkVS;
+export default bengalVS;
