@@ -2,52 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>lab5</title>
+    <title>lab8</title>
 </head>
-<canvas id="scene" width="1470" height="540">
+<canvas id="scene" width="1470" height="740">
     Your browser does not support HTML5
 </canvas>
 <script src="index.js" defer type="module"></script>
-<link href="style.css" rel="stylesheet">
-<body class="body">
-<a id="formula">
-    <p id="attenuation-formula"> Light Attenuation = const/(1.0 + c1*dist + c2*dist^2) </p>
-    <div id="rang" class="attenuation-configure" >
-        <p>c1: </p>
-        <label for="c1-range"></label><input type="text" id="c1-range" value="0.001" >
-        <p>c2: </p>
-        <label for="c2-range"></label><input type="text" id="c2-range" value="0.0001" >
-        <p>distance: </p>
-        <label for="distance"></label><input type="text" id="distance" value="30" >
-    </div>
-</a>
-<a id="formu">
-    <div id="lightingModelInfo">
-        <input id="btn-lighting" type="button" value="Change" style="height:50px; width:100px"/>
-        <p id="lightingModel">Phong Lighting Model</p>
-    </div>
-    <div id="shadingModelInfo">
-        <input id="btn-shading" type="button" value="Change" style="height:50px; width:100px"/>
-        <p id="shadingModel">Phong Shading Model</p>
-    </div>
-    <div class="ambient-configure">
-        <p>AmbientColorCoeff: </p>
-        <label for="myRange"></label><input type="text" id="myRange" value="1">
-    </div>
-</a>
-<a id ="textur">
-
-    <div class="texture-proportions-configure">
-        <p>Texture proportions</p>
-        <div >
-            <p >Digit: </p>
-            <input type="text" id="digit-range" min="0" value="0.8" max="1.0">
-        </div>
-        <div>
-            <p >Material: </p>
-            <input type="text" id="material-range" min="0" value="0.8" max="1.0">
-        </div>
-    </div>
-</a>
-</body>
 </html>
