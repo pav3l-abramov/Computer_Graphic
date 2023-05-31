@@ -56,7 +56,7 @@ let  fs_list= [ PhongFS,GoureauFS, ToonShadingFS],vs_list= [ PhongVS,LambertVS, 
 
 function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size,type) {
     //положение источника света
-    const lightPositionValue = [0,11, distance];
+    const lightPositionValue = [0,0, distance];
     gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uLightPosition"),lightPositionValue);
     //цвет фонового освещения
     gl.uniform3fv( gl.getUniformLocation(shaderProgram, "uAmbientLightColor"),[0.1, 0.1, 0.1]);

@@ -27,7 +27,7 @@ const BlinnPhongVS =[
     'out vec3 vNormal;',
     'out vec3 vCameraPosition;',
     'out highp vec3 vLightWeighting;',
-    'const float shininess = 16.0;',
+    'const float shininess = 36.0;',
     'void main() {',
     'vec4 vertexPositionEye4 = mWorld * vec4(aVertexPosition, 1.0);',
     '    vec3 vertexPositionEye3 = vertexPositionEye4.xyz / vertexPositionEye4.w;',

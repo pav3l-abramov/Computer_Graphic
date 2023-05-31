@@ -20,7 +20,7 @@ const PhongFS =
         'uniform float uShadingModel;',
         'uniform float uAmbientCoeff;',
 
-        'const float shininess = 16.0;',
+        'const float shininess = 18.0;',
         'precision mediump float;',
         'out vec4 fragColor;',
         'void main(void) {',
