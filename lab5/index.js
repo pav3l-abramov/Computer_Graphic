@@ -68,11 +68,8 @@ let propDig = 0.8, propMat = 0.8, orangeTexture, rubinTexture, woodTexture,metal
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
             if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-                // Yes, it's a power of 2. Generate mips.
                 gl.generateMipmap(gl.TEXTURE_2D);
             } else {
-                // No, it's not a power of 2. Turn off mips and set
-                // wrapping to clamp to edge
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -235,8 +232,8 @@ function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size,type) 
     const worldMatrix = glm.mat4.create();
     glm.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
     // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
-    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, 0]);//можно было не трогать камеру, но так проще для понимания
-    glm.mat4.translate(worldMatrix, worldMatrix, [0.0, -2.0, -30.0]);
+    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, -30]);//можно было не трогать камеру, но так проще для понимания
+    glm.mat4.translate(worldMatrix, worldMatrix, [0.0, -2.0, 0.0]);
     //кубы еще не разделены, ставит центр сцены в [12.0, 0.0, 0.0], а крутит вокруг [0.0, 0.0, 0.0]
     glm.mat4.rotateY(worldMatrix, worldMatrix, Scene);
     glm.mat4.translate(worldMatrix, worldMatrix, [0.0, 0.0, 0.0]);//становится локальным центром пьедестала
