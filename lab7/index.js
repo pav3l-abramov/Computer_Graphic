@@ -14,17 +14,22 @@ import {vec3} from "glsl-shader-loader/src/utils/constructor-mask";
 
 
 let gl;
-let ambientCoeff = 0.7, c1 = 0.001, c2 = 0.0001, distance=30;
+let ambientCoeff = 0.7, c1 = 0.001, c2 = 0.001, distance=-40, distX=0,distY=100;
 let propDig = 1.0, propMat = 1.0, orangeTexture,parkTexture,lampTexture,stolbTexture, orangeNormal;
+let backGroundCoef=1.0,lampLeftCoef=1.0,lampRightCoef=1.0,lightsCoef=1.0;
+let backGroundCoefBool,lampLeftCoefBool,lampRightCoefBool, lightsCoefBool;
 let mesh = new OBJ.Mesh(sphere);
 let mesh2 = new OBJ.Mesh(stolb);
 let mesh3 = new OBJ.Mesh(lamp);
-const carPosit= glm.vec3.fromValues(0.0,0.0,0.0);
-let stolbPos1=[7.0, 0.0, -20];
-let stolbPos2=[-7.0, 0.0, -20];
-let lampPos1=[3.0, 2.0, -20];
-let lampPos2=[-3.0, 2.0, -20];
-let lightCarDirection=[0.0,0.0,0.0];
+const carPosit= glm.vec3.fromValues(0.0,-2.0,-20.0);
+let stolbPos1=[9.0, -2.0, -40];
+let stolbPos2=[-9.0, -2.0, -40];
+let lampPos1=[5.0, 0.0, -30.0];
+let lampPos2=[-5.0, 0.0, -30];
+let lightCar1Direction=glm.vec3.fromValues(0.0,-1.0,1.0);
+let lightCar1Position=glm.vec3.fromValues(-0.5,-1.95,-20.0);
+let lightCar2Direction=glm.vec3.fromValues(0.0,-1.0,1.0);
+let lightCar2Position=glm.vec3.fromValues(0.5,-1.95,-20.0);
 
 
 
@@ -99,7 +104,7 @@ function main(id) {
             gl.clearDepth(1.0);
 
             //положение источника света
-            const lightPositionValue = [0, 20, distance];
+            const lightPositionValue = [distX, distY, distance];
             gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uLightPosition"),lightPositionValue);
             //цвет фонового освещения
             gl.uniform3fv( gl.getUniformLocation(shaderProgram, "uAmbientLightColor"),[0.1, 0.1, 0.1]);
@@ -113,6 +118,10 @@ function main(id) {
             gl.uniform1f(gl.getUniformLocation(shaderProgram, "uc2"),c2);
             //коэффициент фонового освещения
             gl.uniform1f(gl.getUniformLocation(shaderProgram, "uAmbientIntensity"),ambientCoeff);
+            backGroundCoefBool= document.querySelector('#background').checked;
+            lampLeftCoefBool= document.querySelector('#lamp_left').checked;
+            lampRightCoefBool=document.querySelector('#lamp_right').checked;
+            lightsCoefBool= document.querySelector('#lights').checked;
 
 
             drawCube(shaderProgram, [1.0, 0.0, 0.0, 1.0], cube1,pedestal, scene,  [0.0, 0.0, 0.0], 0.0,"orange");
@@ -181,42 +190,42 @@ function drawCube(shaderProgram, color, Cube, Pedestal, Scene,  pos, size,type) 
     const worldMatrix = glm.mat4.create();
     glm.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
     // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
-    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, -2.0, -20]);//можно было не трогать камеру, но так проще для понимания
+    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, 0.0]);//можно было не трогать камеру, но так проще для понимания
 
     glm.mat4.translate(worldMatrix, worldMatrix, carPosit);
     //кубы еще не разделены, ставит центр сцены в [12.0, 0.0, 0.0], а крутит вокруг [0.0, 0.0, 0.0]
     glm.mat4.rotateY(worldMatrix, worldMatrix, Cube);
-    //glm.mat4.translate(worldMatrix, worldMatrix, carPosit);//становится локальным центром пьедестала
-    // //кубы уже  разделены (благодаря pos), ставит центр каждого отдельного куба pos относительно [12.0, 0.0, 0.0], а крутит вокруг [12.0, 0.0, 0.0]
-     //glm.mat4.rotateY(worldMatrix, worldMatrix, Cube);
-    // glm.mat4.translate(worldMatrix, worldMatrix, pos);//локальный центр каждого куба, т.к. больше нет translate, то у него больше нет точки, относительно которой он будет вращать локальный центр, поэтому каждый куб имеет свой локальный центр, и каждый центр прописан в pos
-    // glm.mat4.rotateY(worldMatrix, worldMatrix, Cube);
-/*
- glMatrix.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
-        // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
-        glMatrix.mat4.translate(projectionMatrix, projectionMatrix, [0.0, -4.0, -30]);//можно было не трогать камеру, но так проще для понимания
-        glMatrix.mat4.translate(worldMatrix, worldMatrix, [0.0, 0.0, 0.0]);
-        //кубы еще не разделены, ставит центр сцены в [12.0, 0.0, 0.0], а крутит вокруг [0.0, 0.0, 0.0]
-                glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Scene);
-                  glMatrix.mat4.translate(worldMatrix, worldMatrix, [12.0, 0.0, 0.0]);//становится локальным центром пьедестала
-                 //кубы уже  разделены (благодаря pos), ставит центр каждого отдельного куба pos относительно [12.0, 0.0, 0.0], а крутит вокруг [12.0, 0.0, 0.0]
-                 glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Pedestal);
-                 glMatrix.mat4.translate(worldMatrix, worldMatrix, pos);//локальный центр каждого куба, т.к. больше нет translate, то у него больше нет точки, относительно которой он будет вращать локальный центр, поэтому каждый куб имеет свой локальный центр, и каждый центр прописан в pos
-                 glMatrix.mat4.rotateY(worldMatrix, worldMatrix, Cube);
- */
+
+
     gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D, orangeTexture);
     gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler0"), 0);
-
+    if (backGroundCoefBool===true) backGroundCoef=1.0;
+    else backGroundCoef=0.0;
+    if (lampRightCoefBool===true) lampRightCoef=1.0;
+    else lampRightCoef=0.0  ;
+    if (lampLeftCoefBool===true) lampLeftCoef=1.0;
+    else lampLeftCoef=0.0;
+    if (lightsCoefBool===true) lightsCoef=1.0;
+    else lightsCoef=0.0;
 
 
     //теккстуры
     gl.uniform1f(gl.getUniformLocation(shaderProgram,"uPropMat"), propMat);
     gl.uniform1f(gl.getUniformLocation(shaderProgram,"uPropDig"), propDig);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram,"backGroundCoef"), backGroundCoef);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram,"lampLeftCoef"), lampLeftCoef);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram,"lampRightCoef"), lampRightCoef);
+    gl.uniform1f(gl.getUniformLocation(shaderProgram,"lightsCoef"), lightsCoef);
 
 
 
     gl.uniformMatrix4fv(mProj, false, projectionMatrix);
     gl.uniformMatrix4fv(mWorld, false, worldMatrix);
+
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uCarLight1Position"),lightCar1Position);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uCarLight2Position"),lightCar2Position);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uCarLight1Direction"),lightCar1Direction);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "uCarLight2Direction"),lightCar2Direction);
 
     //матрица нормалей
     const normalMatrix = glm.mat4.create();
@@ -275,7 +284,7 @@ function drawLamp(shaderProgram, color, Cube, Pedestal, Scene,  pos, size,type) 
     const worldMatrix = glm.mat4.create();
     glm.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
     // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
-    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, -2.0, -20.0]);
+    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, 0.0]);
     switch (type){
         case "lamp1":glm.mat4.translate(worldMatrix, worldMatrix, lampPos1);break;
         case "lamp2":glm.mat4.translate(worldMatrix, worldMatrix, lampPos2);break;
@@ -362,7 +371,7 @@ function drawStolb(shaderProgram, color, Cube, Pedestal, Scene,  pos, size,type)
     const worldMatrix = glm.mat4.create();
     glm.mat4.perspective(projectionMatrix, fieldOfView, aspect, Near, Far);
     // перемещаем камеру на 4 вниз и 30 от плоскости ху, кубы в центре координат
-    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, -2.0, -20.0]);
+    glm.mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, 0.0]);
     switch (type){
 
         case "stolb1":glm.mat4.translate(worldMatrix, worldMatrix, stolbPos1);break;//можно было не трогать камеру, но так проще для понимания
@@ -604,8 +613,8 @@ function loadShader(gl, type, source) {
     return shader;
 }
 
-var elment= "";
-var cube1= -1.0;
+var elment= "1";
+var cube1= 0.0;
 var cube2= 0.0;
 var cube3= 0.0;
 var cube4= 0.0;
@@ -649,6 +658,9 @@ function checkKeyPressed(e) {
         switch (elment) {
             case "1":
                 cube1 += 0.1;
+                const vector = glm.vec3.fromValues(Math.sin(cube1),-1.0,Math.cos(cube1));
+                lightCar1Direction=vector;
+                lightCar2Direction=vector;
                 break;
             case "2":
                 cube2 -= 0.1;
@@ -672,6 +684,10 @@ function checkKeyPressed(e) {
         switch (elment) {
             case "1":
                 cube1 -= 0.1;
+                const vector = glm.vec3.fromValues(Math.sin(cube1),-1.0,Math.cos(cube1));
+                lightCar1Direction=vector;
+                lightCar2Direction=vector;
+                //glm.vec3.scaleAndAdd(lightCar1Direction, lightCar1Direction, vector, 0.5);
                 break;
             case "2":
                 cube2 += 0.1;
@@ -695,12 +711,17 @@ function checkKeyPressed(e) {
             case "1":
                 cube1Position = 0.5;
                 const vector = glm.vec3.fromValues(-Math.sin(cube1),0.0,-Math.cos(cube1));
-                const vectorTest=[carPosit[0],carPosit[1],carPosit[2]];
-                //glm.vec3.scaleAndAdd(vectorTest, vectorTest, vector, cube1Position);
                 const n=2;
-                const m=40;
-                if (((((carPosit[0]+vector[0]>stolbPos1[0]-n)&&(carPosit[0]+vector[0]<stolbPos1[0]+n))||(((carPosit[0]+vector[0]>stolbPos2[0]-n)&&(carPosit[0]+vector[0]<stolbPos2[0]+n))))&&((carPosit[2]+vector[2]>stolbPos1[2]-n)&&(carPosit[2]+vector[2]<stolbPos1[2]+n)))||carPosit[2]+vector[2]>8||carPosit[2]+vector[2]<-m) cube1Position=0;
-                else glm.vec3.scaleAndAdd(carPosit, carPosit, vector, cube1Position);
+                const m=60;
+                if (((((carPosit[0]+vector[0]>stolbPos1[0]-n)&&(carPosit[0]+vector[0]<stolbPos1[0]+n))||(((carPosit[0]+vector[0]>stolbPos2[0]-n)&&(carPosit[0]+vector[0]<stolbPos2[0]+n))))&&((carPosit[2]+vector[2]>stolbPos1[2]-n)&&(carPosit[2]+vector[2]<stolbPos1[2]+n)))||carPosit[2]+vector[2]>-10||carPosit[2]+vector[2]<-m) cube1Position=0;
+                else {
+                    glm.vec3.scaleAndAdd(carPosit, carPosit, vector, cube1Position);
+
+                    glm.vec3.scaleAndAdd(lightCar1Position, lightCar1Position, vector, cube1Position);
+                    glm.vec3.scaleAndAdd(lightCar2Position, lightCar2Position, vector, cube1Position);
+
+
+                }
                 break;
             case "2":
                 cube2 += 0.1;
@@ -724,12 +745,17 @@ function checkKeyPressed(e) {
             case "1":
                 cube1Position = 0.5;
                 const vector = glm.vec3.fromValues(Math.sin(cube1),0.0,Math.cos(cube1));
-                const vectorTest=[carPosit[0],carPosit[1],carPosit[2]];
-                //glm.vec3.scaleAndAdd(vectorTest, vectorTest, vector, cube1Position);
                 const n=2;
-                const m=40;
-                 if (((((carPosit[0]+vector[0]>stolbPos1[0]-n)&&(carPosit[0]+vector[0]<stolbPos1[0]+n))||(((carPosit[0]+vector[0]>stolbPos2[0]-n)&&(carPosit[0]+vector[0]<stolbPos2[0]+n))))&&((carPosit[2]+vector[2]>stolbPos1[2]-n)&&(carPosit[2]+vector[2]<stolbPos1[2]+n)))||carPosit[2]+vector[2]>8||carPosit[2]+vector[2]<-m) cube1Position=0;
-                 else glm.vec3.scaleAndAdd(carPosit, carPosit, vector, cube1Position);
+                const m=60;
+                 if (((((carPosit[0]+vector[0]>stolbPos1[0]-n)&&(carPosit[0]+vector[0]<stolbPos1[0]+n))||(((carPosit[0]+vector[0]>stolbPos2[0]-n)&&(carPosit[0]+vector[0]<stolbPos2[0]+n))))&&((carPosit[2]+vector[2]>stolbPos1[2]-n)&&(carPosit[2]+vector[2]<stolbPos1[2]+n)))||carPosit[2]+vector[2]>-10||carPosit[2]+vector[2]<-m) cube1Position=0;
+                 else {
+                     glm.vec3.scaleAndAdd(carPosit, carPosit, vector, cube1Position);
+
+                     glm.vec3.scaleAndAdd(lightCar1Position, lightCar1Position, vector, cube1Position);
+                     glm.vec3.scaleAndAdd(lightCar2Position, lightCar2Position, vector, cube1Position);
+
+
+                 }
                 break;
             case "2":
                 cube2 += 0.1;
@@ -748,5 +774,21 @@ function checkKeyPressed(e) {
                 break;
         }
     }
+    // document.getElementById('background').oninput = () => {
+    //     backGroundCoefBool = document.getElementById('background').value;
+    // }
+    // document.getElementById('lamp_left').oninput = () => {
+    //     lampLeftCoefBool = document.getElementById('lamp_left').value;
+    // }
+    // document.getElementById('lamp_right').oninput = () => {
+    //     lampRightCoefBool = document.getElementById('lamp_right').value;
+    // }
+    // document.getElementById('lights').oninput = () => {
+    //     lightsCoefBool = document.getElementById('lights').value;
+    // }
+
+    console.log(backGroundCoefBool);
+
+
 }
 

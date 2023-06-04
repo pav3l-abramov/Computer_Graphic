@@ -13,6 +13,10 @@ const PhongFS =
             'in vec3 vPosition;',
             'in vec2 vTextureCoords;',
             'uniform vec3 uLightPosition;',
+            'uniform vec3 uCarLight1Position;',
+            'uniform vec3 uCarLight2Position;',
+            'uniform vec3 uCarLight1Direction;',
+            'uniform vec3 uCarLight2Direction;',
             'uniform float uc1;',
             'uniform float uc2;',
             'uniform float uAmbientIntensity;',
@@ -21,9 +25,16 @@ const PhongFS =
             'uniform vec3 uSpecularLightColor;',
             'uniform float uPropMat;',
             'uniform float uPropDig;',
+            'uniform float backGroundCoef;',
+            'uniform float lampLeftCoef;',
+            'uniform float lampRightCoef;',
+            'uniform float lightsCoef;',
+
+
+
             'uniform float uShadingModel;',
             'uniform float uAmbientCoeff;',
-            'const float shininess = 32.0;',
+            'const float shininess = 20.0;',
             'out vec4 fragColor;',
             'void main(void) {',
             'vec4 matTex = texture(uSampler0, vTextureCoords);',
@@ -36,10 +47,66 @@ const PhongFS =
             'float specularLightDot = max(dot(reflectionVector, viewVectorEye), 0.0);',
             'float specularLightParam = pow(specularLightDot, shininess);',
             'float attenuation = 1.0 / (1.0 + uc1 * d + uc2 * d * d);',
-            'vec3 vLightWeighting = uAmbientLightColor * uAmbientIntensity + (uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam) * attenuation;;' ,
+            '',
+
+        //первая фара
+        'vec3 carLight1Direction=normalize(uCarLight1Position - vPosition);',
+        'float carLight1LightDot = dot(carLight1Direction, normalize(-uCarLight1Direction));',
+        'float diffuseLightDotcarLight1 = max(dot(vNormal, carLight1Direction), 0.0);',
+        'vec3 reflectionVector3carLight1 = normalize(reflect(-carLight1Direction, vNormal));',
+        'float lightFactorcarLight1 = smoothstep(0.5, 0.8, carLight1LightDot);',
+        '', 'vec3 viewVectorEyecarLight1 = -normalize(vPosition);',
+        'float specularLightDotcarLight1 = max(dot(reflectionVector3carLight1, viewVectorEyecarLight1), 0.0);',
+        'float specularLightParamcarLight1 = pow(specularLightDotcarLight1, shininess);',
+        'float dcarLight1 = distance(uCarLight1Position,vPosition);',
+        'float attenuationcarLight1 = 1.0 / (1.0 + uc1 * dcarLight1 + uc2 * dcarLight1 * dcarLight1);',
+
+        //вторая фара
+        'vec3 carLight2Direction=normalize(uCarLight2Position - vPosition);',
+        'float carLight2LightDot = dot(carLight2Direction, normalize(-uCarLight2Direction));',
+        'float diffuseLightDotcarLight2 = max(dot(vNormal, carLight2Direction), 0.0);',
+        'vec3 reflectionVector3carLight2 = normalize(reflect(-carLight2Direction, vNormal));',
+        'float lightFactorcarLight2 = smoothstep(0.5, 0.8, carLight2LightDot);',
+        '', 'vec3 viewVectorEyecarLight2 = -normalize(vPosition);',
+        'float specularLightDotcarLight2 = max(dot(reflectionVector3carLight2, viewVectorEyecarLight2), 0.0);',
+        'float specularLightParamcarLight2 = pow(specularLightDotcarLight2, shininess);',
+        'float dcarLight2 = distance(uCarLight2Position,vPosition);',
+        'float attenuationcarLight2 = 1.0 / (1.0 + uc1 * dcarLight2 + uc2 * dcarLight2 * dcarLight2);',
+
+
+        //правая лампа
+        'vec3 lamp1Direction=normalize(vec3(5.0, 0.0, -30) - vPosition);',
+        'float lamp1LightDot = dot(lamp1Direction, normalize(-vec3(0.0, -1.0, 0.0)));',
+        'float diffuseLightDotLamp1 = max(dot(vNormal, lamp1Direction), 0.0);',
+        'vec3 reflectionVector3Lamp1 = normalize(reflect(-lamp1Direction, vNormal));',
+        'float lightFactorLamp1 = smoothstep(0.0, 0.7, lamp1LightDot);',
+        '', 'vec3 viewVectorEyeLamp1 = -normalize(vPosition);',
+        'float specularLightDotLamp1 = max(dot(reflectionVector3Lamp1, viewVectorEyeLamp1), 0.0);',
+        'float specularLightParamLamp1 = pow(specularLightDotLamp1, shininess);',
+        'float dLamp1 = distance(vec3(5.0, 0.0, -30),vPosition);',
+        'float attenuationLamp1 = 1.0 / (1.0 + uc1 * dLamp1 + uc2 * dLamp1 * dLamp1);',
+
+
+
+//левая лампа
+        'vec3 lamp2Direction=normalize(vec3(-5.0, 0.0, -30) - vPosition);',
+        'float lamp2LightDot = dot(lamp2Direction, normalize(-vec3(0.0, -1.0, 0.0)));',
+        'float diffuseLightDotLamp2 = max(dot(vNormal, lamp2Direction), 0.0);',
+        'vec3 reflectionVector3Lamp2 = normalize(reflect(-lamp2Direction, vNormal));',
+        'float lightFactorLamp2 = smoothstep(0.0, 0.7, lamp2LightDot);',
+        '', 'vec3 viewVectorEyeLamp2 = -normalize(vPosition);',
+        'float specularLightDotLamp2 = max(dot(reflectionVector3Lamp2, viewVectorEyeLamp2), 0.0);',
+        'float specularLightParamLamp2 = pow(specularLightDotLamp2, shininess);',
+        'float dLamp2 = distance(vec3(-5.0, 0.0, -30),vPosition);',
+        'float attenuationLamp2 = 1.0 / (1.0 + uc1 * dLamp2 + uc2 * dLamp2 * dLamp2);',
+        'vec3 vLightWeighting = uAmbientLightColor * uAmbientIntensity + (uDiffuseLightColor * diffuseLightDot + uSpecularLightColor * specularLightParam)*attenuation*backGroundCoef+' ,
+        '                                                                (uDiffuseLightColor * diffuseLightDotLamp1 + uSpecularLightColor * specularLightParamLamp1)*attenuationLamp1*lightFactorLamp1*lampRightCoef  +',
+        '                                                                (uDiffuseLightColor * diffuseLightDotLamp2 + uSpecularLightColor * specularLightParamLamp2)*attenuationLamp2*lightFactorLamp2*lampLeftCoef+',
+        '                                                                ((uDiffuseLightColor * diffuseLightDotcarLight1 + uSpecularLightColor * specularLightParamcarLight1)*attenuationcarLight1*lightFactorcarLight1 +',
+        '                                                                (uDiffuseLightColor * diffuseLightDotcarLight2 + uSpecularLightColor * specularLightParamcarLight2)*attenuationcarLight2*lightFactorcarLight2)*0.5*lightsCoef ;',
+
         'fragColor = (matTex ) * vec4(vLightWeighting, 1);',
-            '',
-            '',
+
             '}',
     ].join('\n');
 export default PhongFS;
